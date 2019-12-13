@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Meteorenzwerm</title>
+  </head>
+  <body style="background-color:#8060aa;">
+    <img id="schip" style="position: absolute; width: 100px; left: 50px;" src="ufo.png"></img>
+    <img
+      id="steen1"
+      style="width: 100px; left:-200px; position: absolute;"
+      src="spook.png"
+    />
+    <img
+    id="steen2"
+    style="width: 100px; left:-200px; position: absolute;"
+    src="steen.png"
+  />
+  <img
+  id="steen3"
+  style="width: 100px; left:-200px; position: absolute;"
+  src="spook.png"
+/>
+<img
+id="steen4"
+style="width: 100px; left:-200px; position: absolute;"
+src="steen.png"
+/>
+<p id="scoreTB" style="position: absolute; color: yellow; font-size: 20px;">Score: 0</p>
+</body>
+  <script>
+
+    let score=0, yChange=3, speed=5, gameTimer;
+    onkeydown = handleKeys;
+    onready = startUp();
+    function setLeft(id, x) {
+      document.getElementById(id).style.left = x + "px";
+    }
+    function setTop(id, y) {
+      document.getElementById(id).style.top = y + "px";
+    }
+
+    function getLeft(id, x) { 
+      return document.getElementById(id).offsetLeft;
+    }
+    function getTop(id, y) {
+      return document.getElementById(id).offsetTop;
+    }
+
+    function randomNumber(low,high){
+      return (Math.floor(low+Math.random()*(high-low+1)));
+    }
+    
+    function isOverlapping(obj1,obj2){
+      return (
+        (getLeft(obj1)+50>getLeft(obj2))
+        &&(getLeft(obj1)<getLeft(obj2)+50)
+        &&(getTop(obj1)+50>getTop(obj2))
+        &&(getTop(obj1)<getTop(obj2)+50));
+    }
+
+    function startUp() {
+      gameTimer=window.setInterval(moveThings,20);
+    }
+
+    function moveThings(){
+for(let n=1; n<=4;n++){
+  let x=getLeft("steen"+n);
+  if(x<-100){
+    x=window.innerWidth;
+    y=randomNumber(0,window.innerHeight-100);
+    setTop("steen"+n,y);
+    score=score+10;
+    document.getElementById("scoreTB").innerText="Score: "+score;
+  }
+  setLeft("steen"+n,x-speed-n);
+
+  if(isOverlapping("steen"+n, "schip")){
+    gameOver();
+  }
+}
+var y=getTop("schip");
+if((y<=0)||(y>window.innerHeight-100)){
+  yChange=-yChange;
+}
+setTop("schip",y+yChange);
+
+    }
+
+
+    function handleKeys(e) {
+if(e.keyCode==38){yChange=-3;}
+if(e.keyCode==40){yChange=3;}
+    }
+
+    function gameOver(){
+      clearInterval(gameTimer);
+      if(confirm("Game over, once more?")==true){
+        location.reload();
+      }
+    }
+  </script>
+</html>

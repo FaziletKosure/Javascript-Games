@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body style="background-color: blue;">
+    <img
+      id="atoom"
+      src="atoom.png"
+      alt="atoom"
+      style="width: 100px; position:absolute; top:150px; border-radius: 50px"
+    />
+    <img
+      id="ufo"
+      src="ufo.png"
+      alt="ufo"
+      style="width: 75px;position:absolute; top:150px; left:150px;  -webkit-transition:all 0.2s; border-radius:50px;"
+    />
+    <p id="score" style="position: absolute; color:white;font-size:50px;  ">
+      Score:0
+    </p>
+    <p
+      id="tijd"
+      style="position: absolute; color:white;font-size:50px; right:100px "
+    >
+      Tijd:0
+    </p>
+    <script>
+      let score = 0,
+        gameTime = 0,
+        gameTimer,
+        ufoX = 0,
+        ufoY = 0,
+        atoomX = 0,
+        atoomY = 0;
+      onkeydown = handleKeys;
+      onready = startUp();
+      function setLeft(id, x) {
+        document.getElementById(id).style.left = x + "px";
+      }
+      function setTop(id, y) {
+        document.getElementById(id).style.top = y + "px";
+      }
+      function randomNumber(low, hi) {
+        return Math.floor(low + Math.random() * (1 + hi - low));
+      }
+      function startUp() {
+        moveAtoom();
+        gameTimer = window.setInterval(displayTime, 1000);
+      }
+      function displayTime() {
+        gameTime++;
+        document.getElementById("tijd").innerText = "Tijd:" + gameTime;
+      }
+      function moveAtoom() {
+        atoomX = randomNumber(2, 16);
+        atoomY = randomNumber(2, 16);
+        setLeft("atoom", 50 * atoomX);
+        setTop("atoom", 50 * atoomY);
+      }
+      function handleKeys(e) {
+        if (e.keyCode == 37) {
+          ufoX--;
+        }
+        if (e.keyCode == 39) {
+          ufoX++;
+        }
+        if (e.keyCode == 38) {
+          ufoY--;
+        }
+        if (e.keyCode == 40) {
+          ufoY++;
+        }
+        setLeft("ufo", 50 * ufoX);
+        setTop("ufo", 50 * ufoY);
+        checkIfHitAtoom();
+      }
+
+      function checkIfHitAtoom() {
+        console.log("checkIfHitAtoom was called");
+        if (ufoX == atoomX && ufoY == atoomY) {
+          score++;
+          document.getElementById("score").innerText = "Score:" + score;
+          moveAtoom();
+        }
+        if (score == 5) {
+          gameOver();
+        }
+      }
+      function gameOver() {
+        clearInterval(gameTimer);
+        alert("Goed gedaan! Je tijd was:" + gameTime);
+        location.reload();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Serra2</title>
+  </head>
+  <body style="background-color: black;">
+    <div id="mazeHolder" style="position: absolute; top: 0; left: 0;"></div>
+    <img
+      id="player"
+      style="width: 50px; top: 50px; left:0; position: absolute; transition:all 0.2s;"
+      src="spook.png"
+      alt="#"
+    />
+    <style>
+      div {
+        position: absolute;
+        background-color: orange;
+        width: 50px;
+        height: 50px;
+      }
+    </style>
+  </body>
+  <script>
+    //let mazeData = [
+    //   [1, 1, 1, 1, 1, 1, 1, 1],
+    //   [0, 0, 1, 1, 0, 0, 0, 1],
+    //   [1, 0, 0, 0, 0, 1, 1, 1],
+    //   [1, 0, 1, 1, 0, 1, 0, 1],
+    //   [1, 0, 1, 1, 0, 0, 0, 1],
+    //   [1, 0, 0, 0, 0, 1, 0, 0],
+    //   [1, 1, 1, 1, 1, 1, 1, 1]
+    // ];
+    let mazeData = [
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1],
+      [1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1],
+      [1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
+      [1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1],
+      [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+      [1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1],
+      [1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1],
+      [1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1],
+      [1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    ];
+    let px = 0,
+      py = 1;
+    onkeydown = handleKeys;
+    onready = drawMaze();
+    function setLeft(id, x) {
+      document.getElementById(id).style.left = x + "px";
+    }
+    function setTop(id, y) {
+      document.getElementById(id).style.top = y + "px";
+    }
+
+    function drawMaze() {
+      for (let y = 0; y < 12; y++) {
+        for (let x = 0; x < 12; x++) {
+          let newOb = document.createElement("div");
+          document.getElementById("mazeHolder").appendChild(newOb);
+          let divID = Math.random();
+          newOb.setAttribute("id", divID);
+          setLeft(divID, 50 * x);
+          setTop(divID, 50 * y);
+          if (mazeData[y][x] == 0) {
+            document.getElementById(divID).style.backgroundColor = "blue";
+          }
+        }
+      }
+    }
+
+    function handleKeys(e) {
+      if (e.keyCode == 37 && mazeData[py][px - 1] == 0) {
+        px--;
+      }
+      if (e.keyCode == 39 && mazeData[py][px + 1] == 0) {
+        px++;
+      }
+      if (e.keyCode == 38 && mazeData[py - 1][px] == 0) {
+        py--;
+      }
+      if (e.keyCode == 40 && mazeData[py + 1][px] == 0) {
+        py++;
+      }
+      setLeft("player", 50 * px);
+      setTop("player", 50 * py);
+      if (px == 11 && py == 10) {
+        alert("Goed gedaan!");
+        location.reload();
+      }
+    }
+  </script>
+</html>
