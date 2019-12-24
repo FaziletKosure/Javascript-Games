@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <style type="text/css">
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+
+      canvas {
+        background-color: #000;
+        cursor: crosshair;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="playground"></canvas>
+    <script>
+      ///////////////////
+      // MAIN SETTINGS //
+      ///////////////////
+      const canvas = document.getElementById("playground");
+      const ctx = canvas.getContext("2d");
+      const cw = window.innerWidth;
+      const ch = window.innerHeight;
+      canvas.width = cw;
+      canvas.height = ch;
+      const fireworks = [];
+      const particles = [];
+      let hue = 120;
+
+      //////////////////////
+      // HELPER FUNCTIONS //
+      //////////////////////
+      const randomRange = (min, max, floored = false) => {
+        return floored
+          ? Math.floor(Math.random() * (max - min) + min)
+          : Math.random() * (max - min) + min;
+      };
+      const getDistance = (p1x, p1y, p2x, p2y) => {
+        return Math.sqrt(Math.pow(p1x - p2x, 2) + Math.pow(p1y - p2y, 2));
+      };
+
+      /////////////////////
+      // FIREWORK OBJECT //
+      /////////////////////
+      const Firework = function(sx, sy, tx, ty) {
+        this.x = sx;
+        this.y = sy;
+        this.prevX = sx;
+        this.prevY = sy;
+        this.sx = sx;
+        this.sy = sy;
+        this.tx = tx;
+        this.ty = ty;
+        this.totalDistance = getDistance(this.sx, this.sy, this.tx, this.ty);
+        this.speed = 2;
+        this.acceleration = 1.05;
+        this.angle = Math.atan2(ty - sy, tx - sx);
+      };
+
+      Firework.prototype.draw = function() {
+        ctx.beginPath();
+        ctx.moveTo(this.prevX, this.prevY);
+        ctx.strokeStyle = `hsla(${randomRange(15, 35)},100%,60%,.3)`;
+        ctx.lineWidth = 1;
+        ctx.lineTo(this.x, this.y);
+        ctx.stroke();
+      };
+      Firework.prototype.update = function(index) {
+        this.prevX = this.x;
+        this.prevY = this.y;
+        this.speed *= this.acceleration;
+        let vx = Math.cos(this.angle) * this.speed;
+        let vy = Math.sin(this.angle) * this.speed;
+        const distanceTraveled = getDistance(this.sx, this.sy, this.x, this.y);
+        if (distanceTraveled >= this.totalDistance) {
+          createParticles(this.tx, this.ty);
+          fireworks.splice(index, 1);
+        } else {
+          this.x += vx;
+          this.y += vy;
+        }
+      };
+
+      /////////////////////
+      // PARTICLE OBJECT //
+      /////////////////////
+      const Particle = function(x, y) {
+        this.x = x;
+        this.y = y;
+        this.prevX = x;
+        this.prevY = y;
+        this.angle = randomRange(0, Math.PI * 2);
+        this.speed = randomRange(1, 10);
+        this.gravity = 1;
+        this.hue = randomRange(hue - 30, hue + 30);
+        this.brightness = randomRange(50, 80);
+        this.alpha = 1;
+        this.decay = randomRange(0.01, 0.03);
+        this.friction = 0.95;
+        this.lifetime = new Date().getTime();
+      };
+      Particle.prototype.draw = function() {
+        ctx.beginPath();
+        ctx.moveTo(this.prevX, this.prevY);
+        ctx.strokeStyle =
+          "hsla(" +
+          this.hue +
+          ", 100%, " +
+          this.brightness +
+          "%, " +
+          this.alpha +
+          ")";
+        ctx.lineWidth = randomRange(0.5, 2);
+        ctx.lineTo(this.x, this.y);
+        ctx.stroke();
+      };
+      Particle.prototype.update = function(index) {
+        this.speed *= this.friction;
+        let vx = Math.cos(this.angle) * this.speed;
+        let vy = Math.sin(this.angle) * this.speed + this.gravity;
+        this.prevX = this.x;
+        this.prevY = this.y;
+        this.x += vx;
+        this.y += vy;
+        if (new Date().getTime() - this.lifetime >= 1000) {
+          this.alpha -= this.decay;
+          if (this.alpha <= this.decay) {
+            particles.splice(index, 1);
+          }
+        }
+      };
+      /////////////////////
+      // CREATEPARTICLES //
+      /////////////////////
+      const createParticles = (x, y) => {
+        let nrParticles = randomRange(100, 400, true);
+        while (nrParticles--) {
+          particles.push(new Particle(x, y));
+        }
+      };
+
+      ////////////////////
+      // ANIMATION LOOP //
+      ////////////////////
+      const loop = function() {
+        hue = randomRange(0, 360);
+        ctx.fillStyle = "rgb(0, 0, 0)";
+        ctx.fillRect(0, 0, cw, ch);
+        fireworks.forEach((firework, index) => {
+          firework.draw();
+          firework.update(index);
+        });
+        particles.forEach((particle, index) => {
+          particle.draw();
+          particle.update(index);
+        });
+        requestAnimationFrame(loop);
+        //setTimeout(loop, 1);
+      };
+      loop();
+
+      canvas.addEventListener("click", function(e) {
+        fireworks.push(
+          new Firework(
+            cw / 2 - randomRange(0, 15) + randomRange(0, 15),
+            ch + 50,
+            e.pageX,
+            e.pageY
+          )
+        );
+      });
+    </script>
+  </body>
+</html>
